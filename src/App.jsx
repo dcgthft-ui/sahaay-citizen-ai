@@ -51,10 +51,12 @@ export default function App() {
       <a href="#main" className="skip-link">Skip to content</a>
 
       <header className="topbar">
-        <div className="brand">
-          <span className="brand-mark" aria-hidden="true">◈</span>
-          <span className="brand-name">Sahaay</span>
-          <span className="brand-tag">{t("tagline")}</span>
+        <div className="brand"> 
+          <span className="brand-mark" aria-hidden="true">◈</span> 
+          <span className="brand-name">Sahaay</span> 
+          <span className="brand-tag" style={{ marginLeft: "8px", background: "#DFF1E7", color: "#1C8A5B", padding: "2px 8px", borderRadius: "12px", fontSize: "11px", fontWeight: "bold" }}>
+            Resilience Fallback Active
+          </span>
         </div>
         <label className="lang-select">
           <span className="sr-only">Language</span>
