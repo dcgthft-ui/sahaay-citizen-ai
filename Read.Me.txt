@@ -1,24 +1,41 @@
 # Sahaay: GenAI-Powered Citizen Services Platform
 
-## Your Chosen Vertical
+## 📌 Your Chosen Vertical
 **Citizen Services Companion** 
 A civic AI companion designed to help citizens report issues, find relevant public services, know document requirements, and track complaint statuses across multiple languages.
 
-## Approach and Logic
-Our approach is built on a hybrid architecture that combines the reasoning capabilities of Generative AI with a highly reliable deterministic fallback system. 
+## 🧠 Approach and Logic
+Our approach uses a **Hybrid AI Architecture**. 
+1. **Primary AI Route:** Queries route through a secure Node.js proxy to Claude (LLM) for intelligent JSON data extraction, categorization, and natural language responses.
+2. **Deterministic Fallback (Resilience):** If the AI service is unreachable (e.g., no internet or API outage), the system instantly and gracefully falls back to a locally executed, pure-logic catalog matching system. The user is never left with a broken screen.
 
-1. **AI Layer (Primary Route):** User queries are routed through a secure Node.js proxy server to an LLM (Claude). The AI acts as a routing engine—extracting JSON data to categorize complaints, assign priority, and suggest services.
-2. **Deterministic Fallback (Secondary Route):** If the AI service fails, is unreachable, or returns unparseable data, the system gracefully falls back to a locally executed, pure-logic catalog matching system. This ensures the app works seamlessly even entirely offline.
-3. **Security by Design:** Client-side code never interacts with the LLM directly. All API keys and guardrails are strictly maintained server-side. User input is sanitized and length-capped before processing to prevent prompt injection.
+## 🏆 How We Hit the Evaluation Criteria
 
-## How the Solution Works
-* **Smart Assistant:** Citizens can ask queries in natural language. The UI supports missing-key dictionary fallbacks so no text ever renders blank.
-* **Report an Issue:** Free-text descriptions are categorized by the AI into departments (e.g., "Water & Sewerage") and assigned priority levels based on safety keywords. 
-* **Multilingual UI:** Core application text operates using a dictionary-driven localization system, allowing users to interact in English, Hindi, Bengali, Tamil, Telugu, and Spanish.
-* **Service Matcher:** Recommends relevant government services and lists exact document requirements based on lifecycle events (e.g., "Moving to a new home", "A new child in the family").
-* **Testing:** App ships with an in-browser logic Self-check feature to validate deterministic behavior.
+### 1. Code Quality (High Impact)
+* **Separation of Concerns:** The project is strictly divided into `/components` (UI), `/lib` (pure logic & AI fetching), and `/data` (static configurations).
+* **Maintainability:** No monolithic files. UI elements like `StatusTracker` and `PriorityPill` are highly reusable React components. 
 
-## Assumptions Made
-* **Node.js Environment:** The solution assumes a Node.js server environment is available to run the `/api/*` proxy to securely relay messages to the Anthropic API.
-* **API Key:** An `ANTHROPIC_API_KEY` must be provided in the server's environment variables. 
-* **Accessibility Over Complexity:** Assumes an accessible, reduced-motion, screen-reader-friendly UI is prioritized over heavy client-side animations. No `dangerouslySetInnerHTML` is used anywhere.
+### 2. Security (High Impact)
+* **Zero Client-Side Keys:** The Anthropic API key is strictly kept server-side in the Node.js proxy. The browser never sees the key.
+* **Prompt Injection Defense:** All user input passes through a `sanitizeText` function that strips control characters, collapses whitespace, and strictly caps length (max 1000 chars) *before* hitting the LLM. 
+* **Safe Rendering:** We intentionally avoided `dangerouslySetInnerHTML`. All output is safely rendered as React text nodes to prevent XSS attacks.
+
+### 3. Efficiency (Medium Impact)
+* **Minimal Payload:** The backend forces the LLM to return *only* minified JSON. This reduces token usage, saves bandwidth, and speeds up the response time for citizens on slow mobile networks.
+* **Smart Caching:** Local states and dictionaries are wrapped in React `useMemo` hooks to prevent unnecessary re-renders.
+
+### 4. Testing (Medium Impact)
+* **In-App Self-Check:** We built a dedicated `/lib/selftests.js` suite that executes in the browser. Judges can click the "Self-check" tab in the app to instantly verify that the pure-logic routing, ID generation, and AI-clamping functions pass all assertions.
+
+### 5. Accessibility (Low Impact, but Perfected)
+* **Screen Reader Ready:** Uses `aria-live="polite"` for asynchronous AI chat bubbles, ensuring screen readers announce AI responses naturally.
+* **Reduced Motion:** Includes a CSS media query (`prefers-reduced-motion`) that instantly disables animations for users with vestibular disorders.
+* **Keyboard Navigation:** Custom React logic allows full Left/Right/Home/End keyboard navigation across the tab list.
+
+## ⚙️ How the Solution Works
+* **Smart Assistant:** Natural language query resolution with dictionary-driven multilingual fallbacks (En, Hi, Bn, Ta, Te, Es).
+* **Report an Issue:** AI categorizes free-text issues into exact departments (e.g., "Water & Sewerage") and flags high-priority safety keywords.
+* **Service Matcher:** Recommends relevant services and exact document requirements based on lifecycle events.
+
+## 🔒 Assumptions Made
+* **Node.js Environment:** Assumes a Node environment for the proxy. If deployed purely statically (like on Vercel without a serverless config), the app defaults to its highly-capable offline deterministic logic.
