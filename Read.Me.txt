@@ -1,0 +1,24 @@
+# Sahaay: GenAI-Powered Citizen Services Platform
+
+## Your Chosen Vertical
+**Citizen Services Companion** 
+A civic AI companion designed to help citizens report issues, find relevant public services, know document requirements, and track complaint statuses across multiple languages.
+
+## Approach and Logic
+Our approach is built on a hybrid architecture that combines the reasoning capabilities of Generative AI with a highly reliable deterministic fallback system. 
+
+1. **AI Layer (Primary Route):** User queries are routed through a secure Node.js proxy server to an LLM (Claude). The AI acts as a routing engine—extracting JSON data to categorize complaints, assign priority, and suggest services.
+2. **Deterministic Fallback (Secondary Route):** If the AI service fails, is unreachable, or returns unparseable data, the system gracefully falls back to a locally executed, pure-logic catalog matching system. This ensures the app works seamlessly even entirely offline.
+3. **Security by Design:** Client-side code never interacts with the LLM directly. All API keys and guardrails are strictly maintained server-side. User input is sanitized and length-capped before processing to prevent prompt injection.
+
+## How the Solution Works
+* **Smart Assistant:** Citizens can ask queries in natural language. The UI supports missing-key dictionary fallbacks so no text ever renders blank.
+* **Report an Issue:** Free-text descriptions are categorized by the AI into departments (e.g., "Water & Sewerage") and assigned priority levels based on safety keywords. 
+* **Multilingual UI:** Core application text operates using a dictionary-driven localization system, allowing users to interact in English, Hindi, Bengali, Tamil, Telugu, and Spanish.
+* **Service Matcher:** Recommends relevant government services and lists exact document requirements based on lifecycle events (e.g., "Moving to a new home", "A new child in the family").
+* **Testing:** App ships with an in-browser logic Self-check feature to validate deterministic behavior.
+
+## Assumptions Made
+* **Node.js Environment:** The solution assumes a Node.js server environment is available to run the `/api/*` proxy to securely relay messages to the Anthropic API.
+* **API Key:** An `ANTHROPIC_API_KEY` must be provided in the server's environment variables. 
+* **Accessibility Over Complexity:** Assumes an accessible, reduced-motion, screen-reader-friendly UI is prioritized over heavy client-side animations. No `dangerouslySetInnerHTML` is used anywhere.
